@@ -1,0 +1,32 @@
+MESSAGE TestCommand
+  INT16 Header;
+  INT32 Size;
+  STRING Name[8];
+  STRING Password;
+  STRUCT Properties[12]
+    INT32 Count;
+    INT32 Posision;
+  STRUCT evn[12]
+    FLOAT aa;
+  END
+  END
+  STRUCT evn[12]
+    FLOAT aa;
+  END
+END
+MESSAGE TestCommand
+  INT16 Header;
+  INT32 Size;
+  STRING Name[8];
+  STRING Password;
+  STRUCT Properties[12]
+    INT32 Count;
+    INT32 Posision;
+  STRUCT evn[12]
+    FLOAT aa;
+  END
+  END
+  STRUCT evn[12]
+    FLOAT aa;
+  END
+END
