@@ -16,8 +16,8 @@ public class FileParser {
 	private Stack<STRUCT> structs = new Stack<STRUCT>();
 	private List<MESSAGE> allData = new ArrayList<MESSAGE>();
 	private Pattern namePattern = Pattern
-			.compile("[a-zA-Z_\\x7f-\\xff][a-zA-Z0-9_\\x7f-\\xff]*");
-int status = 0;
+			.compile("[a-zA-Z_][a-zA-Z0-9_\\x7f-\\xff]*");
+	int status = 0;
 	public List<MESSAGE> parseToTreeNode(String fileBody)
 			throws SyntaxException, IOException {
 		fileBody = fileBody.replaceAll("\r", "");
@@ -85,6 +85,9 @@ int status = 0;
 				} else {
 					setEnd(line, column);
 				}
+				status = 0;
+				symbol.setLength(0);
+				read = false;
 				break;
 			default:
 				if (!read) {
@@ -127,7 +130,7 @@ int status = 0;
 		STRUCT parent = null;
 		if (!structs.empty()) {
 			parent = structs.peek();
-			parent.addChild(type);
+			parent.__CHILDS__(type);
 		}
 		
 		stack.push(type);
@@ -138,12 +141,12 @@ int status = 0;
 
 	private void setEnd(int line, int column) {
 		DataType obj = stack.peek();
-		if (obj.getName() == null) {
+		if (obj.__NAME__() == null) {
 			throw new SyntaxException("Error or 'END'", line, column);
 		}
 		if (obj instanceof STRUCT) {
 			STRUCT type = (STRUCT) obj;
-			if (type.getChilds() == null || type.getChilds().isEmpty()) {
+			if (type.__CHILDS__() == null || type.__CHILDS__().isEmpty()) {
 				throw new SyntaxException("Empty Struct", line, column);
 			}
 			structs.pop();
@@ -154,7 +157,7 @@ int status = 0;
 			allData.add((MESSAGE) last);
 		} else {
 			if(islast){
-				throw new SyntaxException("Error MESSAGE '" + last.getName() + "'",line, column);
+				throw new SyntaxException("Error MESSAGE '" + last.__NAME__() + "'",line, column);
 			}
 		}
 	}
@@ -174,7 +177,7 @@ int status = 0;
 			} else {
 				
 				if (count.matches("\\d*")) {
-					stack.peek().setArrayCount(Integer.parseInt(count));
+					stack.peek().__ARRAYCOUNT__(Integer.parseInt(count));
 					name = token.substring(0,s);
 				} else {
 					throw new SyntaxException("Syntax error on token '" + token
@@ -187,7 +190,7 @@ int status = 0;
 			throw new SyntaxException("Syntax error on token '" + token + "'",
 					line, column);
 		}
-		stack.peek().setName(name);
+		stack.peek().__NAME__(name);
 	}
 
 }

@@ -3,9 +3,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.List;
 
 import yyang.translate.core.FileParser;
+import yyang.translate.core.GenerateRunCode;
 import yyang.translate.core.type.DataType;
 import yyang.translate.core.type.MESSAGE;
 import yyang.translate.core.type.STRUCT;
@@ -14,7 +16,6 @@ public class start {
 
 	public static void main(String args[]) {
 		File f = new File("src/simple.txt");
-		System.out.println(f.getAbsolutePath());
 		StringBuilder filebody = new StringBuilder();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(f));
@@ -23,13 +24,13 @@ public class start {
 				filebody.append(line);
 				filebody.append("\n");
 			}
-			List<MESSAGE> list = new FileParser().parseToTreeNode(filebody.toString());
-			for(MESSAGE m:list){
-				System.out.println("Type:"+m.getClass().getSimpleName());
-				System.out.println("Name:"+m.getName());
-				System.out.println("Count:"+m.getArrayCount());
-				print(m.getChilds(),0);
-			}
+			List list = new FileParser().parseToTreeNode(filebody.toString());
+//			print(list,0);
+			String body = new GenerateRunCode().GenerateToJava(list);
+			PrintStream fileout=new PrintStream(new File("src/s.java"));
+			fileout.println(body);
+			fileout.flush();
+			fileout.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -43,10 +44,10 @@ public class start {
 		for(int i =0;i<n;i++)space += " ";
 		for(DataType d:list){
 			System.out.println(space+"Type:"+d.getClass().getSimpleName());
-			System.out.println(space+"Name:"+d.getName());
-			System.out.println(space+"Count:"+d.getArrayCount());
+			System.out.println(space+"Name:"+d.__NAME__());
+			System.out.println(space+"Count:"+d.__ARRAYCOUNT__());
 			if(d instanceof STRUCT){
-				print(((STRUCT) d).getChilds(),n+1);
+				print(((STRUCT) d).__CHILDS__(),n+1);
 			}
 			
 		}
