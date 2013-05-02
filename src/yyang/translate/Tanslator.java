@@ -1,3 +1,5 @@
+package yyang.translate;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -8,14 +10,28 @@ import java.util.List;
 
 import yyang.translate.core.FileParser;
 import yyang.translate.core.GenerateRunCode;
-import yyang.translate.core.type.DataType;
-import yyang.translate.core.type.MESSAGE;
-import yyang.translate.core.type.STRUCT;
 
-public class start {
-
+public class Tanslator {
 	public static void main(String args[]) {
-		File f = new File("src/simple.txt");
+		if (args.length<2){
+			System.err.println("Please enter Source file name and Destination Directory(JAVA)\n " +
+					"For Example:\n" +
+					"\tjava yyang.translate.Translator simple.txt directory\n");
+			return;
+		}
+		
+		
+		File f = new File(args[0]);
+		if(!f.exists()){
+			System.err.println("Source file '"+args[0]+"' Does not exists!");
+			return;
+		}
+		File targetDir = new File(args[1]);
+		if(!targetDir.exists()){
+			System.err.println("Destination Directory '"+args[1]+"' Does not exists!");
+			return;
+		}
+		
 		StringBuilder filebody = new StringBuilder();
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(f));
@@ -25,12 +41,8 @@ public class start {
 				filebody.append("\n");
 			}
 			List list = new FileParser().parseToTreeNode(filebody.toString());
-//			print(list,0);
-			String body = new GenerateRunCode().GenerateToJava(list);
-			PrintStream fileout=new PrintStream(new File("src/s.java"));
-			fileout.println(body);
-			fileout.flush();
-			fileout.close();
+			new GenerateRunCode().GenerateToJava(list,args[1]);
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -38,18 +50,6 @@ public class start {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
-	public static void print(List<DataType> list,int n){
-		String space="";
-		for(int i =0;i<n;i++)space += " ";
-		for(DataType d:list){
-			System.out.println(space+"Type:"+d.getClass().getSimpleName());
-			System.out.println(space+"Name:"+d.__NAME__());
-			System.out.println(space+"Count:"+d.__ARRAYCOUNT__());
-			if(d instanceof STRUCT){
-				print(((STRUCT) d).__CHILDS__(),n+1);
-			}
-			
-		}
+		System.out.println("Successful");
 	}
 }

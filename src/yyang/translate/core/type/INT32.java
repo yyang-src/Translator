@@ -1,22 +1,34 @@
 package yyang.translate.core.type;
 
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import yyang.translate.core.Decoder;
 import yyang.translate.core.Encoder;
 
-
-public class INT32 extends DataType implements Encoder<int[]>,Decoder{
-	public String get_targetType(){
+public class INT32 extends DataType implements Encoder<int[]>, Decoder<Integer> {
+	public String get_targetType() {
 		return "int";
 	}
 
 	@Override
-	public byte[] encode(int[] val) {
- 		byte[] target=new byte[val.length*4];
- 		for(int i=0;i<val.length;i++){ 			
- 			for(int j = 0;j < 4;j++){
- 				target[i*4+j] = (byte)(val[i] >> (24 - j * 8)); 
- 			}
- 		}
-		return target;
+	public Integer decode(InputStream source) throws IOException {
+		byte[] b = new byte[4];
+		source.read(b, 0, 4);
+		int bits = 0;
+		for (int i = 0; i < 4; i++) {
+			int n = Byte.valueOf(b[i]).intValue();
+			bits |= (n << (24 - i * 8));
+		}
+		return bits;
+	}
+
+	@Override
+	public void Encode(int[] val, OutputStream out) throws IOException {
+		DataOutputStream wout = new DataOutputStream(out);
+		for (int i = 0; i < val.length; i++)
+			wout.writeInt(val[i]);
 	}
 }
